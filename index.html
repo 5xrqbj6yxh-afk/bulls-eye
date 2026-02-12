@@ -26,6 +26,7 @@
 –neon-green: #00ff83;
 –neon-cyan: #00d4ff;
 –neon-purple: #b794f6;
+–neon-pink: #ff00ff;
 –neon-amber: #ffa500;
 –text-primary: #ffffff;
 –text-secondary: #94a3b8;
@@ -36,6 +37,37 @@
 –shadow: 0 4px 16px rgba(0,0,0,0.4);
 –radius: 16px;
 –radius-sm: 8px;
+}
+
+/* EXTREME ANIMATIONS */
+@keyframes neonPulse {
+0%, 100% {
+box-shadow: 0 0 5px var(–neon-cyan), 0 0 10px var(–neon-cyan), 0 0 15px var(–neon-cyan);
+}
+50% {
+box-shadow: 0 0 10px var(–neon-cyan), 0 0 20px var(–neon-cyan), 0 0 30px var(–neon-cyan);
+}
+}
+
+@keyframes gradientShift {
+0% { background-position: 0% 50%; }
+50% { background-position: 100% 50%; }
+100% { background-position: 0% 50%; }
+}
+
+@keyframes float {
+0%, 100% { transform: translateY(0px); }
+50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+0% { background-position: -1000px 0; }
+100% { background-position: 1000px 0; }
+}
+
+@keyframes glow {
+0%, 100% { filter: brightness(1) drop-shadow(0 0 5px currentColor); }
+50% { filter: brightness(1.2) drop-shadow(0 0 20px currentColor); }
 }
 
 body {
@@ -166,29 +198,59 @@ pointer-events: none;
 font-size: 18px;
 }
 
-/* Portfolio Summary */
+/* Portfolio Summary - EXTREME */
 .portfolio-summary {
-padding: 20px;
-background: linear-gradient(135deg, rgba(0,255,131,0.08), rgba(0,212,255,0.08));
-border: 1px solid rgba(0,255,131,0.2);
-border-radius: var(–radius);
+padding: 24px;
+background: linear-gradient(135deg, rgba(0,255,131,0.15), rgba(0,212,255,0.15));
+background-size: 200% 200%;
+animation: gradientShift 5s ease infinite;
+border: 2px solid;
+border-image: linear-gradient(135deg, var(–neon-green), var(–neon-cyan)) 1;
+border-radius: 20px;
 margin: 16px 16px 0;
+box-shadow: 0 0 40px rgba(0,255,131,0.3), 0 0 80px rgba(0,212,255,0.2);
+position: relative;
+overflow: hidden;
+}
+
+.portfolio-summary::before {
+content: ‘’;
+position: absolute;
+top: -50%;
+right: -50%;
+width: 200%;
+height: 200%;
+background: radial-gradient(circle, rgba(0,255,131,0.1) 0%, transparent 70%);
+animation: float 6s ease-in-out infinite;
 }
 
 .portfolio-value {
-font-size: 36px;
+font-size: 40px;
 font-weight: 700;
-margin-bottom: 6px;
+margin-bottom: 8px;
 letter-spacing: -1px;
+color: #ffffff;
+text-shadow: 0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(0,255,131,0.3);
+position: relative;
+z-index: 1;
 }
 
 .portfolio-change {
-font-size: 17px;
+font-size: 18px;
 font-weight: 700;
+position: relative;
+z-index: 1;
 }
 
-.portfolio-change.positive { color: var(–green); }
-.portfolio-change.negative { color: var(–red); }
+.portfolio-change.positive {
+color: var(–neon-green);
+text-shadow: 0 0 15px rgba(0,255,131,0.5);
+}
+
+.portfolio-change.negative {
+color: var(–red);
+text-shadow: 0 0 15px rgba(255,71,87,0.5);
+}
 
 /* Content Area */
 .content {
@@ -243,84 +305,131 @@ box-shadow: 0 4px 12px rgba(0,255,131,0.3);
 transform: scale(0.95);
 }
 
-/* Stock Cards */
+/* Stock Cards - EXTREME EDITION */
 .stock-list {
 padding: 0 16px;
 }
 
 .stock-card {
-background: var(–bg-card);
-border: 1px solid var(–border);
+background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(183,148,246,0.1));
+border: 2px solid;
+border-image: linear-gradient(135deg, var(–neon-cyan), var(–neon-purple)) 1;
 border-radius: var(–radius);
-padding: 18px;
-margin-bottom: 14px;
+padding: 20px;
+margin-bottom: 16px;
 cursor: pointer;
-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 position: relative;
 overflow: hidden;
-min-height: 140px;
+min-height: 150px;
+box-shadow: 0 8px 32px rgba(0,212,255,0.2);
+}
+
+.stock-card::before {
+content: ‘’;
+position: absolute;
+top: -50%;
+left: -50%;
+width: 200%;
+height: 200%;
+background: linear-gradient(
+45deg,
+transparent,
+rgba(0,212,255,0.1),
+transparent
+);
+transform: rotate(45deg);
+animation: shimmer 3s infinite;
 }
 
 .stock-card:active {
-transform: scale(0.98);
-border-color: var(–neon-green);
+transform: scale(0.98) translateY(2px);
+box-shadow: 0 4px 16px rgba(0,212,255,0.4), 0 0 40px rgba(0,212,255,0.2);
 }
 
 .stock-card-header {
 display: flex;
 justify-content: space-between;
 align-items: flex-start;
-margin-bottom: 14px;
+margin-bottom: 16px;
+position: relative;
+z-index: 1;
 }
 
 .stock-info h3 {
-font-size: 22px;
+font-size: 24px;
 font-weight: 700;
 margin-bottom: 6px;
-letter-spacing: 0.3px;
+letter-spacing: 0.5px;
+background: linear-gradient(135deg, #ffffff, var(–neon-cyan));
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+animation: glow 3s ease-in-out infinite;
 }
 
 .stock-info p {
 font-size: 13px;
-color: var(–text-dim);
+color: var(–text-secondary);
 line-height: 1.3;
+font-weight: 500;
 }
 
 .stock-score {
-background: linear-gradient(135deg, var(–neon-cyan), var(–neon-purple));
-color: var(–bg-primary);
-padding: 10px 18px;
-border-radius: 14px;
-font-size: 26px;
+background: linear-gradient(135deg, var(–neon-cyan), var(–neon-purple), var(–neon-pink));
+background-size: 200% 200%;
+animation: gradientShift 3s ease infinite;
+color: #ffffff;
+padding: 12px 20px;
+border-radius: 16px;
+font-size: 28px;
 font-weight: 700;
-min-width: 70px;
+min-width: 75px;
 text-align: center;
-box-shadow: 0 4px 12px rgba(0,212,255,0.3);
+box-shadow: 0 0 20px rgba(0,212,255,0.5), 0 0 40px rgba(183,148,246,0.3);
+text-shadow: 0 0 10px rgba(255,255,255,0.5);
+animation: neonPulse 2s ease-in-out infinite;
 }
 
 .stock-price {
 display: flex;
 justify-content: space-between;
 align-items: center;
-padding-top: 14px;
-border-top: 1px solid var(–border);
+padding-top: 16px;
+border-top: 2px solid rgba(0,212,255,0.3);
 margin-top: auto;
+position: relative;
+z-index: 1;
 }
 
 .price-main {
-font-size: 26px;
+font-size: 28px;
 font-weight: 700;
 letter-spacing: -0.5px;
+color: #ffffff;
+text-shadow: 0 0 10px rgba(255,255,255,0.3);
 }
 
 .price-change {
-font-size: 15px;
+font-size: 16px;
 font-weight: 700;
 text-align: right;
+padding: 6px 12px;
+border-radius: 8px;
+backdrop-filter: blur(10px);
 }
 
-.price-change.positive { color: var(–green); }
-.price-change.negative { color: var(–red); }
+.price-change.positive {
+color: var(–neon-green);
+background: rgba(0,255,131,0.2);
+box-shadow: 0 0 15px rgba(0,255,131,0.3);
+}
+
+.price-change.negative {
+color: var(–red);
+background: rgba(255,71,87,0.2);
+box-shadow: 0 0 15px rgba(255,71,87,0.3);
+}
 
 /* AI Insight Badge */
 .ai-badge {
@@ -462,26 +571,45 @@ display: none;
 }
 
 .timeframe-btn {
-padding: 8px 16px;
-background: var(–bg-secondary);
-border: 1px solid var(–border);
-border-radius: 8px;
+padding: 10px 18px;
+background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(183,148,246,0.1));
+border: 2px solid rgba(0,212,255,0.3);
+border-radius: 10px;
 color: var(–text-secondary);
-font-size: 13px;
+font-size: 14px;
 font-weight: 700;
 white-space: nowrap;
 cursor: pointer;
-min-height: 36px;
+min-height: 40px;
 display: flex;
 align-items: center;
-transition: all 0.2s;
+transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+position: relative;
+overflow: hidden;
+}
+
+.timeframe-btn::before {
+content: ‘’;
+position: absolute;
+top: 0;
+left: -100%;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+transition: left 0.5s;
+}
+
+.timeframe-btn:hover::before {
+left: 100%;
 }
 
 .timeframe-btn.active {
-background: var(–neon-cyan);
-color: var(–bg-primary);
-border-color: var(–neon-cyan);
-box-shadow: 0 2px 8px rgba(0,212,255,0.3);
+background: linear-gradient(135deg, var(–neon-cyan), var(–neon-purple));
+color: #ffffff;
+border-color: transparent;
+box-shadow: 0 0 20px rgba(0,212,255,0.5), 0 0 40px rgba(183,148,246,0.3);
+animation: neonPulse 2s ease-in-out infinite;
+text-shadow: 0 0 10px rgba(255,255,255,0.5);
 }
 
 .timeframe-btn:active {
@@ -531,46 +659,73 @@ animation: spin 1s linear infinite;
 to { transform: rotate(360deg); }
 }
 
-/* News Feed */
+/* News Feed - EXTREME EDITION */
 .news-item {
-background: linear-gradient(135deg, #1f2937, #151b2e);
-border: 1px solid rgba(255,255,255,0.15);
-border-radius: 14px;
-padding: 18px;
-margin-bottom: 14px;
-transition: all 0.2s;
+background: linear-gradient(135deg, rgba(31,41,55,0.8), rgba(21,27,46,0.8));
+backdrop-filter: blur(10px);
+border: 2px solid rgba(0,212,255,0.3);
+border-radius: 16px;
+padding: 20px;
+margin-bottom: 16px;
+transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+position: relative;
+overflow: hidden;
+box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.news-item::before {
+content: ‘’;
+position: absolute;
+top: -50%;
+left: -50%;
+width: 200%;
+height: 200%;
+background: linear-gradient(
+45deg,
+transparent,
+rgba(0,212,255,0.05),
+transparent
+);
+transform: rotate(45deg);
 }
 
 .news-item:active {
-transform: scale(0.99);
+transform: translateY(-4px) scale(1.02);
 border-color: var(–neon-cyan);
-box-shadow: 0 0 0 3px rgba(0,212,255,0.2);
+box-shadow: 0 0 40px rgba(0,212,255,0.4), 0 12px 48px rgba(0,0,0,0.4);
 }
 
 .news-source {
 font-size: 12px;
 color: var(–neon-cyan);
 text-transform: uppercase;
-letter-spacing: 0.8px;
-margin-bottom: 10px;
+letter-spacing: 1px;
+margin-bottom: 12px;
 font-weight: 700;
+text-shadow: 0 0 10px rgba(0,212,255,0.5);
+position: relative;
+z-index: 1;
 }
 
 .news-headline {
 font-size: 16px;
 font-weight: 600;
 line-height: 1.6;
-margin-bottom: 12px;
+margin-bottom: 14px;
 color: #ffffff;
+position: relative;
+z-index: 1;
 }
 
 .news-footer {
 display: flex;
 justify-content: space-between;
 align-items: center;
-margin-top: 12px;
-padding-top: 12px;
-border-top: 1px solid rgba(255,255,255,0.1);
+margin-top: 14px;
+padding-top: 14px;
+border-top: 2px solid rgba(0,212,255,0.2);
+position: relative;
+z-index: 1;
 }
 
 .news-time {
@@ -582,21 +737,26 @@ font-weight: 500;
 .news-link {
 display: inline-flex;
 align-items: center;
-gap: 6px;
-padding: 8px 18px;
-background: linear-gradient(135deg, #00d4ff, #00b8e6);
-color: #0a0e1a;
-border-radius: 10px;
+gap: 8px;
+padding: 10px 20px;
+background: linear-gradient(135deg, #00d4ff, #00b8e6, var(–neon-purple));
+background-size: 200% 200%;
+animation: gradientShift 3s ease infinite;
+color: #ffffff;
+border-radius: 12px;
 font-size: 13px;
 font-weight: 700;
 text-decoration: none;
-transition: all 0.2s;
-box-shadow: 0 4px 12px rgba(0,212,255,0.3);
+transition: all 0.3s;
+box-shadow: 0 0 20px rgba(0,212,255,0.4);
+text-shadow: 0 0 5px rgba(255,255,255,0.3);
+border: 2px solid transparent;
 }
 
 .news-link:active {
 transform: scale(0.95);
-box-shadow: 0 2px 8px rgba(0,212,255,0.4);
+box-shadow: 0 0 30px rgba(0,212,255,0.6), 0 0 60px rgba(183,148,246,0.4);
+border-color: #ffffff;
 }
 
 /* Premium Badge */
@@ -1282,12 +1442,36 @@ function renderDetailContent(stock) {
     const isPositive = stock.changePercent >= 0;
     
     container.innerHTML = `
-        <!-- Price Header -->
-        <div style="background: linear-gradient(135deg, #151b2e, #1f2937); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; margin-bottom: 20px;">
-            <div style="font-size: 42px; font-weight: 700; margin-bottom: 10px; color: #ffffff;">
+        <!-- Price Header - EXTREME STYLE -->
+        <div style="
+            background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(183,148,246,0.2));
+            background-size: 200% 200%;
+            animation: gradientShift 5s ease infinite;
+            border: 2px solid;
+            border-image: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink)) 1;
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 0 40px rgba(0,212,255,0.3), 0 0 80px rgba(183,148,246,0.2);
+            position: relative;
+            overflow: hidden;
+        ">
+            <div style="
+                font-size: 48px;
+                font-weight: 700;
+                margin-bottom: 12px;
+                color: #ffffff;
+                text-shadow: 0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(0,212,255,0.3);
+                letter-spacing: -1px;
+            ">
                 $${(stock.price || 0).toFixed(2)}
             </div>
-            <div style="font-size: 20px; font-weight: 700; color: ${isPositive ? '#00ff83' : '#ff4757'}">
+            <div style="
+                font-size: 22px;
+                font-weight: 700;
+                color: ${isPositive ? '#00ff83' : '#ff4757'};
+                text-shadow: 0 0 15px ${isPositive ? 'rgba(0,255,131,0.5)' : 'rgba(255,71,87,0.5)'};
+            ">
                 ${isPositive ? '+' : ''}$${Math.abs(stock.change || 0).toFixed(2)} 
                 (${isPositive ? '+' : ''}${(stock.changePercent || 0).toFixed(2)}%)
             </div>
@@ -1295,40 +1479,80 @@ function renderDetailContent(stock) {
         
         <!-- Chart -->
         <div class="detail-section">
-            <div class="section-title">📈 Advanced Chart</div>
-            <div class="chart-container">
+            <div class="section-title" style="
+                font-size: 20px;
+                background: linear-gradient(135deg, #ffffff, var(--neon-cyan));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            ">📈 Advanced Chart</div>
+            <div class="chart-container" style="
+                background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(183,148,246,0.05));
+                border: 2px solid rgba(0,212,255,0.3);
+                box-shadow: 0 0 30px rgba(0,212,255,0.2);
+            ">
                 <div class="chart-timeframes">
-                    <div class="timeframe-btn active" onclick="loadChart('${stock.symbol}', '1D')">1D</div>
-                    <div class="timeframe-btn" onclick="loadChart('${stock.symbol}', '1W')">1W</div>
-                    <div class="timeframe-btn" onclick="loadChart('${stock.symbol}', '1M')">1M</div>
-                    <div class="timeframe-btn" onclick="loadChart('${stock.symbol}', '3M')">3M</div>
-                    <div class="timeframe-btn" onclick="loadChart('${stock.symbol}', '1Y')">1Y</div>
+                    <div class="timeframe-btn active" onclick="loadChart('${stock.symbol}', '1D', this)">1D</div>
+                    <div class="timeframe-btn" onclick="loadChart('${stock.symbol}', '1W', this)">1W</div>
+                    <div class="timeframe-btn" onclick="loadChart('${stock.symbol}', '1M', this)">1M</div>
+                    <div class="timeframe-btn" onclick="loadChart('${stock.symbol}', '3M', this)">3M</div>
+                    <div class="timeframe-btn" onclick="loadChart('${stock.symbol}', '1Y', this)">1Y</div>
                 </div>
                 <div id="chart"></div>
             </div>
         </div>
         
-        <!-- AI Analysis -->
+        <!-- AI Analysis - EXTREME -->
         <div class="detail-section">
-            <div class="section-title">🤖 AI Analysis</div>
-            <div class="ai-analysis" id="aiAnalysis">
+            <div class="section-title" style="
+                background: linear-gradient(135deg, #ffffff, var(--neon-purple));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            ">🤖 AI Analysis</div>
+            <div class="ai-analysis" id="aiAnalysis" style="
+                background: linear-gradient(135deg, rgba(183,148,246,0.25), rgba(183,148,246,0.15));
+                border: 2px solid rgba(183,148,246,0.6);
+                box-shadow: 0 0 40px rgba(183,148,246,0.3);
+                animation: neonPulse 3s ease-in-out infinite;
+            ">
                 ${state.aiAnalysis[stock.symbol] || '<div class="ai-loading"><div class="spinner"></div> Generating AI insights...</div>'}
             </div>
         </div>
         
-        <!-- News -->
+        <!-- News - EXTREME -->
         <div class="detail-section">
-            <div class="section-title">📰 Latest News</div>
+            <div class="section-title" style="
+                background: linear-gradient(135deg, #ffffff, var(--neon-green));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            ">📰 Latest News</div>
             <div id="newsContainer">
                 ${renderNews(stock.symbol)}
             </div>
         </div>
         
-        <!-- Premium Features -->
+        <!-- Premium Features - EXTREME -->
         <div class="detail-section">
-            <div class="section-title">
+            <div class="section-title" style="
+                background: linear-gradient(135deg, #ffffff, #FFD700);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            ">
                 💎 Premium Features 
-                <span style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #0a0e1a; padding: 4px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; margin-left: 8px;">PRO</span>
+                <span style="
+                    background: linear-gradient(135deg, #FFD700, #FFA500);
+                    color: #0a0e1a;
+                    padding: 6px 14px;
+                    border-radius: 10px;
+                    font-size: 12px;
+                    font-weight: 700;
+                    margin-left: 10px;
+                    box-shadow: 0 0 20px rgba(255,215,0,0.5);
+                    animation: neonPulse 2s ease-in-out infinite;
+                ">PRO</span>
             </div>
             <div id="premiumContainer">
                 ${renderPremiumFeatures(stock.symbol)}
@@ -1336,56 +1560,86 @@ function renderDetailContent(stock) {
         </div>
     `;
     
-    // Initialize chart
-    setTimeout(() => loadChart(stock.symbol, '1D'), 100);
+    // Initialize chart with slight delay to ensure DOM is ready
+    setTimeout(() => {
+        const firstBtn = document.querySelector('.timeframe-btn.active');
+        loadChart(stock.symbol, '1D', firstBtn);
+    }, 200);
 }
 
 // Load chart
-async function loadChart(symbol, timeframe) {
+async function loadChart(symbol, timeframe, buttonElement) {
     const chartDiv = document.getElementById('chart');
-    if (!chartDiv) return;
+    if (!chartDiv) {
+        console.error('Chart div not found');
+        return;
+    }
+    
+    // Check if TradingView library is loaded
+    if (typeof LightweightCharts === 'undefined') {
+        console.error('TradingView library not loaded');
+        chartDiv.innerHTML = '<div style="padding: 40px; text-align: center; color: #94a3b8;">Chart library loading... Please wait.</div>';
+        // Retry after 1 second
+        setTimeout(() => loadChart(symbol, timeframe, buttonElement), 1000);
+        return;
+    }
     
     // Clear existing chart
     chartDiv.innerHTML = '';
     
-    // Create chart
-    const chart = LightweightCharts.createChart(chartDiv, {
-        width: chartDiv.clientWidth,
-        height: 300,
-        layout: {
-            background: { color: '#151b2e' },
-            textColor: '#94a3b8',
-        },
-        grid: {
-            vertLines: { color: 'rgba(255,255,255,0.05)' },
-            horzLines: { color: 'rgba(255,255,255,0.05)' },
-        },
-        timeScale: {
-            borderColor: 'rgba(255,255,255,0.1)',
-        },
-        rightPriceScale: {
-            borderColor: 'rgba(255,255,255,0.1)',
+    try {
+        // Create chart
+        const chart = LightweightCharts.createChart(chartDiv, {
+            width: chartDiv.clientWidth,
+            height: 300,
+            layout: {
+                background: { color: '#151b2e' },
+                textColor: '#94a3b8',
+            },
+            grid: {
+                vertLines: { color: 'rgba(255,255,255,0.05)' },
+                horzLines: { color: 'rgba(255,255,255,0.05)' },
+            },
+            timeScale: {
+                borderColor: 'rgba(255,255,255,0.1)',
+            },
+            rightPriceScale: {
+                borderColor: 'rgba(255,255,255,0.1)',
+            }
+        });
+        
+        const candlestickSeries = chart.addCandlestickSeries({
+            upColor: '#00ff83',
+            downColor: '#ff4757',
+            borderVisible: false,
+            wickUpColor: '#00ff83',
+            wickDownColor: '#ff4757',
+        });
+        
+        // Show loading message
+        chartDiv.style.opacity = '0.5';
+        
+        // Fetch candle data
+        const candles = await fetchCandles(symbol, timeframe);
+        
+        chartDiv.style.opacity = '1';
+        
+        if (candles && candles.length > 0) {
+            candlestickSeries.setData(candles);
+            chart.timeScale().fitContent();
+        } else {
+            chartDiv.innerHTML = '<div style="padding: 40px; text-align: center; color: #94a3b8;">No chart data available for this timeframe</div>';
         }
-    });
-    
-    const candlestickSeries = chart.addCandlestickSeries({
-        upColor: '#00ff83',
-        downColor: '#ff4757',
-        borderVisible: false,
-        wickUpColor: '#00ff83',
-        wickDownColor: '#ff4757',
-    });
-    
-    // Fetch candle data
-    const candles = await fetchCandles(symbol, timeframe);
-    if (candles && candles.length > 0) {
-        candlestickSeries.setData(candles);
-        chart.timeScale().fitContent();
+        
+        // Update active timeframe button
+        document.querySelectorAll('.timeframe-btn').forEach(btn => btn.classList.remove('active'));
+        if (buttonElement) {
+            buttonElement.classList.add('active');
+        }
+    } catch (error) {
+        console.error('Chart error:', error);
+        chartDiv.innerHTML = '<div style="padding: 40px; text-align: center; color: #ff4757;">Failed to load chart. Please try again.</div>';
     }
-    
-    // Update active timeframe button
-    document.querySelectorAll('.timeframe-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
 }
 
 // Fetch candle data
