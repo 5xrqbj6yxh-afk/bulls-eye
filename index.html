@@ -387,7 +387,7 @@ top: 0;
 left: 0;
 right: 0;
 bottom: 0;
-background: var(–bg-primary);
+background-color: #000000;
 z-index: 2000;
 transform: translateY(100%);
 transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -402,9 +402,9 @@ transform: translateY(0);
 .detail-header {
 position: sticky;
 top: 0;
-background: var(–bg-primary);
-border-bottom: 1px solid var(–border);
-padding: 16px 20px;
+background-color: #0a0e1a;
+border-bottom: 2px solid rgba(255,255,255,0.1);
+padding: 20px 20px 16px;
 z-index: 100;
 backdrop-filter: blur(20px);
 display: flex;
@@ -413,13 +413,16 @@ align-items: center;
 }
 
 .detail-header h2 {
-font-size: 22px;
+font-size: 26px;
 font-weight: 700;
+color: #ffffff;
 }
 
 .detail-content {
 padding: 20px;
 padding-bottom: 100px;
+background-color: #0a0e1a;
+min-height: 100vh;
 }
 
 .detail-section {
@@ -427,12 +430,13 @@ margin-bottom: 32px;
 }
 
 .section-title {
-font-size: 16px;
+font-size: 18px;
 font-weight: 700;
 margin-bottom: 16px;
 display: flex;
 align-items: center;
-gap: 8px;
+gap: 10px;
+color: var(–text-primary);
 }
 
 /* Chart Container */
@@ -447,26 +451,40 @@ margin-bottom: 16px;
 .chart-timeframes {
 display: flex;
 gap: 8px;
-margin-bottom: 12px;
+margin-bottom: 14px;
 overflow-x: auto;
+-webkit-overflow-scrolling: touch;
+}
+
+.chart-timeframes::-webkit-scrollbar {
+display: none;
 }
 
 .timeframe-btn {
-padding: 6px 14px;
+padding: 8px 16px;
 background: var(–bg-secondary);
 border: 1px solid var(–border);
 border-radius: 8px;
 color: var(–text-secondary);
-font-size: 12px;
-font-weight: 600;
+font-size: 13px;
+font-weight: 700;
 white-space: nowrap;
 cursor: pointer;
+min-height: 36px;
+display: flex;
+align-items: center;
+transition: all 0.2s;
 }
 
 .timeframe-btn.active {
 background: var(–neon-cyan);
 color: var(–bg-primary);
 border-color: var(–neon-cyan);
+box-shadow: 0 2px 8px rgba(0,212,255,0.3);
+}
+
+.timeframe-btn:active {
+transform: scale(0.95);
 }
 
 #chart {
@@ -478,23 +496,25 @@ border-radius: var(–radius-sm);
 
 /* AI Analysis */
 .ai-analysis {
-background: linear-gradient(135deg, rgba(183,148,246,0.1), rgba(183,148,246,0.05));
-border: 1px solid rgba(183,148,246,0.3);
+background: linear-gradient(135deg, rgba(183,148,246,0.12), rgba(183,148,246,0.06));
+border: 1px solid rgba(183,148,246,0.4);
 border-radius: var(–radius);
-padding: 16px;
+padding: 18px;
 }
 
 .ai-analysis-text {
-line-height: 1.6;
-color: var(–text-secondary);
+line-height: 1.7;
+color: var(–text-primary);
 margin-bottom: 12px;
+font-size: 15px;
 }
 
 .ai-loading {
 display: flex;
 align-items: center;
 gap: 12px;
-color: var(–text-dim);
+color: var(–text-secondary);
+font-size: 14px;
 }
 
 .spinner {
@@ -515,13 +535,16 @@ to { transform: rotate(360deg); }
 background: var(–bg-card);
 border: 1px solid var(–border);
 border-radius: var(–radius-sm);
-padding: 14px;
-margin-bottom: 10px;
+padding: 16px;
+margin-bottom: 12px;
 cursor: pointer;
+transition: all 0.2s;
 }
 
 .news-item:active {
 background: var(–bg-tertiary);
+transform: scale(0.99);
+border-color: var(–neon-cyan);
 }
 
 .news-source {
@@ -529,19 +552,49 @@ font-size: 11px;
 color: var(–text-dim);
 text-transform: uppercase;
 letter-spacing: 0.5px;
-margin-bottom: 6px;
+margin-bottom: 8px;
+font-weight: 700;
 }
 
 .news-headline {
-font-size: 14px;
+font-size: 15px;
 font-weight: 600;
-line-height: 1.4;
-margin-bottom: 6px;
+line-height: 1.5;
+margin-bottom: 10px;
+color: var(–text-primary);
+}
+
+.news-footer {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-top: 10px;
+padding-top: 10px;
+border-top: 1px solid var(–border);
 }
 
 .news-time {
 font-size: 11px;
 color: var(–text-dim);
+}
+
+.news-link {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+padding: 6px 14px;
+background: var(–neon-cyan);
+color: var(–bg-primary);
+border-radius: 8px;
+font-size: 12px;
+font-weight: 700;
+text-decoration: none;
+transition: all 0.2s;
+}
+
+.news-link:active {
+transform: scale(0.95);
+background: #00b8e6;
 }
 
 /* Premium Badge */
@@ -1423,10 +1476,15 @@ function renderNews(symbol) {
     }
     
     return news.map(item => `
-        <div class="news-item" onclick="window.open('${item.url}', '_blank')">
+        <div class="news-item">
             <div class="news-source">${item.source}</div>
             <div class="news-headline">${item.headline}</div>
-            <div class="news-time">${formatTime(item.datetime)}</div>
+            <div class="news-footer">
+                <div class="news-time">${formatTime(item.datetime)}</div>
+                <a href="${item.url}" target="_blank" class="news-link" onclick="event.stopPropagation()">
+                    Read Article →
+                </a>
+            </div>
         </div>
     `).join('');
 }
