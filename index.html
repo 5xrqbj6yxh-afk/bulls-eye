@@ -741,7 +741,6 @@ function updNews(){var c=document.getElementById(‘newsContent’);c.innerHTML=
 
 /* === View Switching === */
 function switchView(v){state.currentView=v;var views=document.querySelectorAll(’.view’);for(var i=0;i<views.length;i++)views[i].classList.remove(‘active’);var tabs=document.querySelectorAll(’.tab-item’);for(var j=0;j<tabs.length;j++)tabs[j].classList.remove(‘active’);document.getElementById(v+‘View’).classList.add(‘active’);document.querySelector(’.tab-item[data-view=”’+v+’”]’).classList.add(‘active’);if(v===‘analysis’)renderAT();if(v===‘news’)rnNewsView();if(v===‘ai’)renderAI();if(v===‘trade’)renderTrade();if(v===‘settings’)rnSettings();}
-document.getElementById(‘sectorTabs’).addEventListener(‘click’,function(e){if(!e.target.classList.contains(‘sector-tab’))return;var tabs=document.querySelectorAll(’#sectorTabs .sector-tab’);for(var i=0;i<tabs.length;i++)tabs[i].classList.remove(‘active’);e.target.classList.add(‘active’);state.currentTab=e.target.getAttribute(‘data-tab’);renderStocks();});
 /* ═══════════════════════════════════════════
 Settings, Themes, PWA, Notifications, Export, Init
 ═══════════════════════════════════════════ */
@@ -788,14 +787,14 @@ init();
 AI Intelligence — Claude-Powered Features
 ═══════════════════════════════════════════ */
 var AI_FEATURES=[
-{id:‘chat’,icon:‘💬’,title:‘AI Stock Chat’,desc:‘Ask Claude anything about any stock. Get instant analysis, comparisons, and recommendations.’,badge:‘Interactive’},
-{id:‘brief’,icon:‘📊’,title:‘AI Market Brief’,desc:‘Daily market summary with key movers, sector trends, and what to watch today.’,badge:‘Daily’},
-{id:‘ideas’,icon:‘💡’,title:‘AI Trade Ideas’,desc:‘AI-generated trade setups with entry, exit, stop-loss, and detailed reasoning.’,badge:‘Pro’},
-{id:‘review’,icon:‘🔍’,title:‘AI Portfolio Review’,desc:‘Comprehensive portfolio audit. Diversification analysis, risk scoring, and rebalancing suggestions.’,badge:‘Pro’},
-{id:‘patterns’,icon:‘📈’,title:‘AI Pattern Recognition’,desc:‘Detect chart patterns: head & shoulders, double bottoms, wedges, flags, and more.’,badge:‘Technical’},
-{id:‘sentiment’,icon:‘🧠’,title:‘AI Sentiment Digest’,desc:‘Aggregate news sentiment across your entire portfolio. Bullish/bearish trend analysis.’,badge:‘Intelligence’},
-{id:‘similar’,icon:‘🔗’,title:‘Stocks Like This’,desc:‘Discover similar stocks based on your holdings. Sector, momentum, and fundamental matching.’,badge:‘Discovery’},
-{id:‘risk’,icon:‘🛡️’,title:‘AI Risk Report’,desc:‘Portfolio-wide risk scoring. Concentration risk, correlation analysis, and hedging suggestions.’,badge:‘Pro’}
+{id:‘chat’,icon:’💬’,title:‘AI Stock Chat’,desc:‘Ask Claude anything about any stock. Get instant analysis, comparisons, and recommendations.’,badge:‘Interactive’},
+{id:‘brief’,icon:’📊’,title:‘AI Market Brief’,desc:‘Daily market summary with key movers, sector trends, and what to watch today.’,badge:‘Daily’},
+{id:‘ideas’,icon:’💡’,title:‘AI Trade Ideas’,desc:‘AI-generated trade setups with entry, exit, stop-loss, and detailed reasoning.’,badge:‘Pro’},
+{id:‘review’,icon:’🔍’,title:‘AI Portfolio Review’,desc:‘Comprehensive portfolio audit. Diversification analysis, risk scoring, and rebalancing suggestions.’,badge:‘Pro’},
+{id:‘patterns’,icon:’📈’,title:‘AI Pattern Recognition’,desc:‘Detect chart patterns: head & shoulders, double bottoms, wedges, flags, and more.’,badge:‘Technical’},
+{id:‘sentiment’,icon:’🧠’,title:‘AI Sentiment Digest’,desc:‘Aggregate news sentiment across your entire portfolio. Bullish/bearish trend analysis.’,badge:‘Intelligence’},
+{id:‘similar’,icon:’🔗’,title:‘Stocks Like This’,desc:‘Discover similar stocks based on your holdings. Sector, momentum, and fundamental matching.’,badge:‘Discovery’},
+{id:‘risk’,icon:’🛡’,title:‘AI Risk Report’,desc:‘Portfolio-wide risk scoring. Concentration risk, correlation analysis, and hedging suggestions.’,badge:‘Pro’}
 ];
 
 function renderAI(){
