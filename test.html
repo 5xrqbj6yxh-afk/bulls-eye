@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Safari Test</title>
+<style>
+body{background:#0f1419;color:#fff;font-family:sans-serif;padding:20px}
+.btn{padding:12px 24px;background:#3b82f6;color:#fff;border:none;border-radius:8px;font-size:16px;margin:8px;cursor:pointer}
+.btn:active{background:#2563eb}
+#log{margin-top:20px;padding:12px;background:#1a1f2e;border-radius:8px;font-family:monospace;font-size:12px;min-height:100px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h1>Safari Test Page</h1>
+<p>If you see this, HTML renders. Deploy time: Feb 14 2026</p>
+<button class="btn" onclick="testBtn('Button 1 works!')">Test Button 1</button>
+<button class="btn" onclick="testBtn('Button 2 works!')">Test Button 2</button>
+<button class="btn" onclick="testFetch()">Test API Fetch</button>
+<div id="log">Waiting for clicks...</div>
+<script>
+function testBtn(msg){
+document.getElementById('log').textContent += '\n' + msg;
+}
+function testFetch(){
+document.getElementById('log').textContent += '\nFetching...';
+fetch('https://finnhub.io/api/v1/quote?symbol=AAPL&token=ctv4rohr01qhb0grkcp0ctv4rohr01qhb0grkcpg')
+.then(function(r){return r.json();})
+.then(function(d){document.getElementById('log').textContent += '\nAAPL: $' + d.c;})
+.catch(function(e){document.getElementById('log').textContent += '\nFetch error: ' + e.message;});
+}
+document.getElementById('log').textContent += '\nJS executed OK';
+</script>
+</body>
+</html>
