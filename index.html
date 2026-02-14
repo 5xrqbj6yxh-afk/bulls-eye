@@ -3,9 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -440,12 +438,8 @@ body.theme-oled .detail-modal,body.theme-oled .detail-header{background-color:#0
 <div class="toast" id="toast"></div>
 <div class="chart-tooltip" id="chartTooltip"></div>
 <script>
-window.onerror=function(msg,url,line,col,err){
-var d=document.getElementById('stockListContainer');
-if(d)d.innerHTML='<div style="padding:20px;color:#ef4444;font-family:monospace;font-size:11px;word-break:break-all">ERROR: '+msg+'<br>Line: '+line+':'+col+'<br>'+(err?err.stack:'no stack')+'</div>';
-return false;};
-/* SW cleanup */
-try{if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(r){for(var i=0;i<r.length;i++)r[i].unregister();});}if(window.caches){caches.keys().then(function(k){for(var i=0;i<k.length;i++)caches.delete(k[i]);});}}catch(swErr){}
+try{if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(r){for(var i=0;i<r.length;i++)r[i].unregister();});}if(window.caches){caches.keys().then(function(k){for(var i=0;i<k.length;i++)caches.delete(k[i]);});}}catch(e){}
+window.onerror=function(m,u,l,c,e){var d=document.getElementById("stockListContainer");if(d)d.innerHTML="<div style=padding:20px;color:red;font-size:12px>ERR: "+m+" L:"+l+"</div>";};
 /* ===========================================
    BULLS EYE PRO v15.0 -- Market Scanner + AI
    =========================================== */
@@ -519,25 +513,12 @@ renderStocks();
 
 /* === MARKET SCANNER – Find best stocks across exchanges === */
 function fetchTrendingStocks(){
-showToast(‘Scanning markets…’);
+showToast(‘Scanning all exchanges…’);
 return Promise.all([
 fmpFetch(’/stock_market/gainers’).then(function(d){return(d||[]).slice(0,20).map(function(s){s._tag=‘gainer’;return s;});}).catch(function(){return[];}),
 fmpFetch(’/stock_market/losers’).then(function(d){return(d||[]).slice(0,15).map(function(s){s._tag=‘loser’;return s;});}).catch(function(){return[];}),
 fmpFetch(’/stock_market/actives’).then(function(d){return(d||[]).slice(0,20).map(function(s){s._tag=‘active’;return s;});}).catch(function(){return[];}),
-/* Finnhub market news to extract trending tickers */
-sfetch(FH+’/news?category=general&minId=10&token=’+state.settings.apiKey).then(function(news){
-if(!news||!Array.isArray(news))return[];
-var tickers=[];var seen={};
-news.forEach(function(n){if(n.related){n.related.split(’,’).forEach(function(t){t=t.trim();if(t&&!seen[t]&&t.indexOf(’.’)<0){seen[t]=true;tickers.push(t);}});}});
-/* Fetch quotes for extracted tickers */
-var batch=tickers.slice(0,15);
-return Promise.all(batch.map(function(sym){
-return fmpQuote(sym).then(function(q){
-if(q&&q.c>0)return{symbol:sym,name:q.name||sym,price:q.c,change:q.d||0,changesPercentage:q.dp||0,marketCap:q.marketCap||0,_tag:‘hot’};
-return null;
-}).catch(function(){return null;});
-})).then(function(results){return results.filter(function(r){return r!==null;});});
-}).catch(function(){return[];})
+sfetch(FH+’/news?category=general&minId=10&token=’+state.settings.apiKey).then(function(news){if(!news||!Array.isArray(news))return[];var tk=[];var sn={};news.forEach(function(n){if(n.related){n.related.split(’,’).forEach(function(t){t=t.trim();if(t&&!sn[t]&&t.indexOf(’.’)<0&&t.length<6){sn[t]=true;tk.push(t);}});}});return tk.slice(0,10).map(function(t){return{symbol:t,name:t,price:0,change:0,changesPercentage:0,marketCap:0,_tag:‘hot’};});}).catch(function(){return[];})
 ]).then(function(results){
 var all=[];var seen={};
 results.forEach(function(group){if(!group||!Array.isArray(group))return;group.forEach(function(s){if(!s||!s.symbol||seen[s.symbol])return;if(s.symbol.indexOf(’.’)>=0&&s.symbol.indexOf(’.SS’)<0&&s.symbol.indexOf(’.L’)<0)return;seen[s.symbol]=true;all.push(s);});});
@@ -548,18 +529,8 @@ return{symbol:s.symbol,name:s.name||s.companyName||s.symbol,sector:‘market’,
 }).sort(function(a,b){return b.score-a.score;});
 showToast(state.trendingStocks.length+’ stocks scanned’);
 if(state.homeMode===‘market’)renderStocks();
-/* If scanner got nothing, try FMP screener as last resort */
-if(state.trendingStocks.length===0){
-fmpFetch(’/stock-screener?marketCapMoreThan=10000000000&volumeMoreThan=5000000&betaMoreThan=1&limit=30’).then(function(d){
-if(!d||!Array.isArray(d)||!d.length)return;
-state.trendingStocks=d.filter(function(s){return s.symbol&&s.symbol.indexOf(’.’)<0;}).slice(0,25).map(function(s){
-var sc=scoreStock({c:s.price||0,dp:s.changesPercentage||0,h:s.price||0,l:s.price||0,marketCap:s.marketCap||0},s.symbol);
-return{symbol:s.symbol,name:s.companyName||s.symbol,sector:‘market’,price:s.price||0,change:s.change||0,changePercent:s.changesPercentage||0,high:s.price||0,low:s.price||0,open:s.price||0,prevClose:(s.price||0)-(s.change||0),volume:s.volume||0,marketCap:s.marketCap||0,pe:0,score:sc,tag:‘active’};
-}).sort(function(a,b){return b.score-a.score;});
-if(state.trendingStocks.length>0){showToast(state.trendingStocks.length+’ stocks found’);if(state.homeMode===‘market’)renderStocks();}
-}).catch(function(){});
-}
 }).catch(function(){showToast(‘Scanner unavailable’);});
+if(state.trendingStocks.length===0){fmpFetch(’/stock-screener?marketCapMoreThan=10000000000&volumeMoreThan=5000000&limit=25’).then(function(d){if(!d||!Array.isArray(d))return;state.trendingStocks=d.filter(function(s){return s.symbol&&s.symbol.indexOf(’.’)<0;}).slice(0,20).map(function(s){return{symbol:s.symbol,name:s.companyName||s.symbol,sector:‘market’,price:s.price||0,change:0,changePercent:s.changesPercentage||0,high:s.price||0,low:s.price||0,open:s.price||0,prevClose:s.price||0,volume:0,marketCap:s.marketCap||0,pe:0,score:scoreStock({c:s.price||0,dp:s.changesPercentage||0,h:s.price||0,l:s.price||0,marketCap:s.marketCap||0},s.symbol),tag:‘active’};}).sort(function(a,b){return b.score-a.score;});if(state.trendingStocks.length&&state.homeMode===‘market’)renderStocks();}).catch(function(){});}
 }
 
 /* WebSocket */
@@ -664,9 +635,9 @@ function renderStocks(){
 var h=’’;
 if(state.homeMode===‘market’){
 /* MARKET SCANNER MODE: show all scanned stocks across exchanges */
-var scanStocks=[];var _seen={};if(state.trendingStocks.length>0){state.trendingStocks.forEach(function(s){if(!_seen[s.symbol]){_seen[s.symbol]=true;scanStocks.push(s);}});}state.stocks.forEach(function(s){if(!_seen[s.symbol]){_seen[s.symbol]=true;scanStocks.push(s);}});scanStocks.sort(function(a,b){return b.score-a.score;});
+var scanStocks=[];var _sn={};if(state.trendingStocks.length>0){state.trendingStocks.forEach(function(s){if(!_sn[s.symbol]){_sn[s.symbol]=true;scanStocks.push(s);}});}state.stocks.forEach(function(s){if(!_sn[s.symbol]){_sn[s.symbol]=true;scanStocks.push(s);}});scanStocks.sort(function(a,b){return b.score-a.score;});
 var filtered=state.signalFilter===‘all’?scanStocks:scanStocks.filter(function(s){return computeSignal(s).key===state.signalFilter;});
-h+=’<div class="market-scan-info">’+filtered.length+’ stocks ranked’+(state.trendingStocks.length>0?’ across exchanges’:’ — scanning…’)+’</div>’;
+h+=’<div class="market-scan-info">’+filtered.length+’ stocks ranked’+(state.trendingStocks.length>0?’ across exchanges’:’ – scanning…’)+’</div>’;
 h+=’<div class="stock-list">’;
 for(var k=0;k<filtered.length;k++)h+=renderStockCard(filtered[k],true);
 if(!filtered.length&&scanStocks.length)h+=’<div style="text-align:center;padding:24px;color:#64748b">No stocks match this signal</div>’;
@@ -716,14 +687,7 @@ function renameWL(){var n=document.getElementById(‘wlNameInput’).value.trim(
 function deleteWL(){if(activeWatchlist===‘Portfolio’)return;delete watchlists[activeWatchlist];activeWatchlist=‘Portfolio’;saveWL();renderWLS();closeWM();loadDemoData();renderStocks();showToast(‘Deleted’);}
 /* Search */
 var sTimer=null;var sIn=document.getElementById(‘searchInput’);var sRes=document.getElementById(‘searchResults’);
-sIn.addEventListener(‘input’,function(){clearTimeout(sTimer);var q=this.value.trim();if(q.length<1){sRes.classList.remove(‘show’);return;}if(q.length<2){showSR([]);return;}sTimer=setTimeout(function(){
-/* Try FMP first, fallback to Finnhub */
-sfetch(FMP+’/search?query=’+encodeURIComponent(q)+’&limit=10&apikey=’+FK).then(function(d){
-if(d&&Array.isArray(d)&&d.length>0){showSR(d.filter(function(r){return r.symbol&&r.symbol.indexOf(’.’)<0;}).slice(0,10).map(function(r){return{symbol:r.symbol,description:r.name||r.symbol};}));return;}
-/* Fallback: Finnhub search */
-return sfetch(FH+’/search?q=’+encodeURIComponent(q)+’&token=’+state.settings.apiKey).then(function(fh){
-if(fh&&fh.result&&fh.result.length>0){showSR(fh.result.filter(function(r){return r.symbol&&r.symbol.indexOf(’.’)<0;}).slice(0,10).map(function(r){return{symbol:r.symbol,description:r.description||r.symbol};}));return;}
-showSR([]);});});},300);});
+sIn.addEventListener(‘input’,function(){clearTimeout(sTimer);var q=this.value.trim();if(q.length<1){sRes.classList.remove(‘show’);return;}if(q.length<2){showSR([]);return;}sTimer=setTimeout(function(){sfetch(FMP+’/search?query=’+encodeURIComponent(q)+’&limit=10&apikey=’+FK).then(function(d){if(d&&Array.isArray(d)&&d.length>0){showSR(d.filter(function(r){return r.symbol&&r.symbol.indexOf(’.’)<0;}).slice(0,10).map(function(r){return{symbol:r.symbol,description:r.name||r.symbol};}));return;}return sfetch(FH+’/search?q=’+encodeURIComponent(q)+’&token=’+state.settings.apiKey).then(function(fh){if(fh&&fh.result&&fh.result.length>0){showSR(fh.result.filter(function(r){return r.symbol&&r.symbol.indexOf(’.’)<0;}).slice(0,10).map(function(r){return{symbol:r.symbol,description:r.description||r.symbol};}));return;}showSR([]);});});},300);});
 sIn.addEventListener(‘blur’,function(){setTimeout(function(){sRes.classList.remove(‘show’);},200);});
 function showSR(r){if(!r.length){sRes.innerHTML=’<div style="padding:16px;text-align:center;color:#64748b;font-size:13px">Type to search any ticker</div>’;sRes.classList.add(‘show’);return;}var ex={};for(var i=0;i<state.stocks.length;i++)ex[state.stocks[i].symbol]=true;sRes.innerHTML=r.map(function(r){var il=ex[r.symbol];var sn=(r.description||r.symbol).replace(/’/g,”\’”).replace(/”/g,’’);return ‘<div class=“search-result-item” onclick=”’+(il?“openDetail(’”+r.symbol+”’);sRes.classList.remove(‘show’);sIn.value=’’;”:“addStock(’”+r.symbol+”’,’”+sn+”’)”)+’”><div><div class="search-result-sym">’+r.symbol+’</div><div class="search-result-name">’+(r.description||’’)+’</div></div><div class="search-result-add">’+(il?‘View’:’+ Add’)+’</div></div>’;}).join(’’);sRes.classList.add(‘show’);}
 function addStock(sym,name){if(state.stocks.some(function(s){return s.symbol===sym;}))return;sIn.value=’’;sRes.classList.remove(‘show’);showToast(‘Adding ‘+sym+’…’);var obj={symbol:sym,name:name||sym,sector:‘tech’,price:0,change:0,changePercent:0,high:0,low:0,open:0,prevClose:0,volume:0,marketCap:0,pe:0,score:50};state.stocks.push(obj);watchlists[activeWatchlist].push({symbol:sym,name:name||sym,sector:‘tech’});saveWL();Promise.all([fetchQ(sym),fetchProfile(sym)]).then(function(res){var d=res[0];var prof=res[1];for(var j=0;j<state.stocks.length;j++){if(state.stocks[j].symbol===sym){if(d&&d.c>0){state.stocks[j].price=d.c;state.stocks[j].change=d.d||0;state.stocks[j].changePercent=d.dp||0;state.stocks[j].high=d.h||d.c;state.stocks[j].low=d.l||d.c;state.stocks[j].open=d.o||d.c;state.stocks[j].prevClose=d.pc||d.c;if(d.marketCap)state.stocks[j].marketCap=d.marketCap;if(d.pe)state.stocks[j].pe=d.pe;state.stocks[j].score=scoreStock(d,sym);setCQ(sym,d);}if(prof){state.stocks[j].name=prof.name;state.stocks[j].sector=prof.sector;var wl=watchlists[activeWatchlist];for(var w=0;w<wl.length;w++){if(wl[w].symbol===sym){wl[w].name=prof.name;wl[w].sector=prof.sector;break;}}saveWL();}break;}}renderStocks();renderWLS();showToast(sym+’ added’);});}
@@ -768,7 +732,7 @@ function sentiment(h){var hl=h.toLowerCase();var bu=0,be=0;for(var i=0;i<BULL.le
 function extractTK(h,sym){var tk=[];if(sym)tk.push(sym);var m=h.match(/$[A-Z]{1,5}/g);if(m)m.forEach(function(x){var t=x.substring(1);if(tk.indexOf(t)<0)tk.push(t);});for(var i=0;i<state.stocks.length;i++){var s=state.stocks[i];if(h.indexOf(s.symbol)>=0&&tk.indexOf(s.symbol)<0)tk.push(s.symbol);}return tk.slice(0,3);}
 function demoNews(sym){var s=findStock(sym);var nm=s?s.name:sym;return[nm+’ Reports Strong Quarter’,‘Analysts Upgrade ‘+sym+’ to Outperform’,nm+’ Partnership Expands Market’,sym+’ Faces Regulatory Concerns’,sym+’ Revenue Growth Accelerates’].map(function(h,i){return{headline:h,source:[‘Reuters’,‘Bloomberg’,‘CNBC’,‘MarketWatch’,‘WSJ’][i],mono:[‘RE’,‘BL’,‘CN’,‘MW’,‘WS’][i],url:’#’,datetime:Date.now()/1000-(i+1)*7200,hoursAgo:(i+1)*2,relSym:sym};});}
 function fetchNews(sym){if(state.newsCache[sym]&&Date.now()-state.newsCache[sym].ts<300000)return Promise.resolve(state.newsCache[sym].data);var today=new Date().toISOString().split(‘T’)[0];var wa=new Date(Date.now()-7*864e5).toISOString().split(‘T’)[0];return apiFetch(’/company-news?symbol=’+sym+’&from=’+wa+’&to=’+today).then(function(d){if(d&&Array.isArray(d)&&d.length>0){var arr=d.slice(0,10).map(function(i){return{headline:i.headline,source:i.source||‘Unknown’,mono:(i.source||‘UN’).substring(0,2).toUpperCase(),url:i.url||’#’,datetime:i.datetime,hoursAgo:Math.max(1,Math.floor((Date.now()/1000-i.datetime)/3600)),relSym:sym};});state.newsCache[sym]={data:arr,ts:Date.now()};return arr;}var dm=demoNews(sym);state.newsCache[sym]={data:dm,ts:Date.now()};return dm;});}
-function rnNI(it,compact){var t=it.hoursAgo<24?it.hoursAgo+‘h’:Math.floor(it.hoursAgo/24)+‘d’;var sn=sentiment(it.headline);var tk=extractTK(it.headline,it.relSym);var sr=’<div class="news-sentiment">’;for(var i=0;i<tk.length;i++)sr+=’<span class="news-ticker-tag" onclick="event.stopPropagation();tryOpen(\''+tk[i]+'\')">’+tk[i]+’</span>’;sr+=’<span class="news-signal '+sn.c+'">’+sn.i+’ ‘+sn.l+’</span></div>’;return ‘<div class="news-item"><div class="news-source-row"><div class="news-monogram">’+it.mono+’</div><div class="news-source-name">’+it.source+’</div><div class="news-time">’+t+’</div></div><div class="news-headline">’+it.headline+’</div>’+sr+(it.url&&it.url!==’#’&&!compact?’<a class="news-link" href="'+it.url+'" target="_blank">Read article</a>’:’’)+’</div>’;}
+function rnNI(it,compact){var t=it.hoursAgo<24?it.hoursAgo+‘h’:Math.floor(it.hoursAgo/24)+‘d’;var sn=sentiment(it.headline);var tk=extractTK(it.headline,it.relSym);var sr=’<div class="news-sentiment">’;for(var i=0;i<tk.length;i++)sr+=’<span class="news-ticker-tag" onclick="event.stopPropagation();tryOpen(\''+tk[i]+'\')">’+tk[i]+’</span>’;sr+=’<span class="news-signal '+sn.c+'">’+sn.i+’ ‘+sn.l+’</span></div>’;var _src=it.source||‘Unknown’;var _mono=_src.substring(0,2).toUpperCase();var _nid=‘ns’+Math.floor(Math.random()*9e5);return ‘<div class=“news-item” data-hl=”’+it.headline.replace(/”/g,’’)+’”><div class="news-source-row"><div class="news-monogram">’+_mono+’</div><div class="news-source-name">’+_src+’</div><div class="news-time">’+t+’</div></div><div class="news-headline">’+it.headline+’</div>’+sr+(it.url&&it.url!==’#’&&!compact?’<a class="news-link" href="'+it.url+'" target="_blank">Read article</a>’:’’)+(compact?’’:’<div class="news-summary-toggle" onclick="toggleNS(\''+_nid+'\',this)">AI Summary</div><div class="news-summary" id="'+_nid+'"></div>’)+’</div>’;}
 function tryOpen(sym){if(findStock(sym)){openDetail(sym);return;}addStock(sym,sym);setTimeout(function(){openDetail(sym);},1500);}
 
 /* Analysis View */
@@ -816,6 +780,7 @@ function updNews(){var c=document.getElementById(‘newsContent’);c.innerHTML=
 /* === View Switching === */
 function switchView(v){state.currentView=v;var views=document.querySelectorAll(’.view’);for(var i=0;i<views.length;i++)views[i].classList.remove(‘active’);var tabs=document.querySelectorAll(’.tab-item’);for(var j=0;j<tabs.length;j++)tabs[j].classList.remove(‘active’);document.getElementById(v+‘View’).classList.add(‘active’);document.querySelector(’.tab-item[data-view=”’+v+’”]’).classList.add(‘active’);if(v===‘analysis’)renderAT();if(v===‘news’)rnNewsView();if(v===‘ai’)renderAI();if(v===‘trade’)renderTrade();if(v===‘settings’)rnSettings();}
 function toggleNewsSummary(id,headline){var el=document.getElementById(id);if(!el)return;if(el.classList.contains(‘show’)){el.classList.remove(‘show’);return;}el.classList.add(‘show’);el.innerHTML=’<div class="news-summary-loading">Analyzing article…</div>’;callClaude(‘Summarize this financial news headline in 2-3 sentences. Explain what it means for investors and any potential market impact: “’+headline+’”’,function(resp,err){if(resp){el.innerHTML=’<div class="news-summary-text">’+resp.replace(/\n/g,’<br>’)+’</div>’;}else{/* Algorithmic summary */var sn=sentiment(headline);var summ=’’;if(sn.c===‘bullish’)summ=‘This headline carries a positive signal for the market. ‘+headline.split(’ ‘).slice(0,3).join(’ ‘)+’ suggests bullish momentum which could support near-term price appreciation. Investors may want to monitor for follow-through confirmation.’;else if(sn.c===‘bearish’)summ=‘This headline signals potential headwinds. The bearish tone suggests caution may be warranted. Consider reviewing exposure to related positions and watching for further developments.’;else summ=‘This headline is largely neutral in tone. No strong directional signal detected. Monitor for additional catalysts that could shift sentiment in either direction.’;el.innerHTML=’<div class="news-summary-text">’+summ+’</div>’;}});}
+function toggleNS(id,btn){var el=document.getElementById(id);if(!el)return;if(el.classList.contains(‘show’)){el.classList.remove(‘show’);return;}el.classList.add(‘show’);var hl=btn?btn.closest(’.news-item’).getAttribute(‘data-hl’)||’’:’’;el.innerHTML=’<div class="news-summary-loading">Analyzing…</div>’;callClaude(‘Summarize this financial news in 2-3 sentences for investors: “’+hl+’”’,function(resp,err){if(resp){el.innerHTML=’<div class="news-summary-text">’+resp.replace(/\n/g,’<br>’)+’</div>’;}else{var sn=sentiment(hl);el.innerHTML=’<div class="news-summary-text">’+(sn.c===‘bullish’?‘Positive signal. This suggests bullish momentum which could support near-term price appreciation. Monitor for confirmation.’:sn.c===‘bearish’?‘Caution warranted. Bearish tone suggests reviewing exposure to related positions.’:‘Neutral tone. No strong directional signal. Watch for additional catalysts.’)+’</div>’;}});}
 /* ===========================================
 Settings, Themes, PWA, Notifications, Export, Init
 =========================================== */
@@ -856,7 +821,7 @@ document.getElementById(‘stocksView’).addEventListener(‘touchstart’,func
 document.getElementById(‘stocksView’).addEventListener(‘touchmove’,function(e){if(!pAct)return;var dy=e.touches[0].clientY-pY2;if(dy>10&&window.scrollY<=5){pInd.classList.add(‘pulling’);pTxt.textContent=dy>80?‘Release to refresh’:‘Pull to refresh’;pOK=dy>80;}else pInd.classList.remove(‘pulling’);},{passive:true});
 document.getElementById(‘stocksView’).addEventListener(‘touchend’,function(){if(!pAct)return;pAct=false;if(pOK){pTxt.innerHTML=’<span class="pull-spinner"></span> Refreshing…’;pInd.classList.add(‘refreshing’);DS=‘auto’;loadRealData().then(function(){renderStocks();fetchTrendingStocks();});}setTimeout(function(){pInd.classList.remove(‘pulling’);pInd.classList.remove(‘refreshing’);pTxt.textContent=‘Pull to refresh’;},600);});
 /* Init */
-function init(){applyTheme();renderWLS();loadDemoData();renderStocks();loadRealData().then(function(){renderStocks();fetchTrendingStocks();});setupAR();/* SW disabled */setTimeout(function(){connectWS();},3000);}
+function init(){applyTheme();renderWLS();loadDemoData();renderStocks();loadRealData().then(function(){renderStocks();fetchTrendingStocks();});setupAR();setTimeout(function(){connectWS();},3000);}
 init();
 /* ===========================================
 AI Intelligence – Claude-Powered Features
@@ -1064,11 +1029,7 @@ if(resEl){resEl.innerHTML=’<div class="ai-search-item" onclick="aiSelectTicker
 if(q.length<2)return;
 aiSearchTimer=setTimeout(function(){
 sfetch(FMP+’/search?query=’+encodeURIComponent(q)+’&limit=8&apikey=’+FK).then(function(d){
-if(d&&Array.isArray(d)&&d.length>0){var filtered=d.filter(function(r){return r.symbol;}).slice(0,6);if(resEl){resEl.innerHTML=filtered.map(function(r){var sn=(r.name||r.symbol).replace(/’/g,’’).replace(/”/g,’’);return ‘<div class="ai-search-item" onclick="aiSelectTicker(\''+r.symbol+'\',\''+resId+'\')"><strong>’+r.symbol+’</strong> – ‘+sn+’</div>’;}).join(’’);resEl.classList.add(‘show’);}return;}
-/* Fallback: Finnhub */
-return sfetch(FH+’/search?q=’+encodeURIComponent(q)+’&token=’+state.settings.apiKey).then(function(fh){
-if(fh&&fh.result&&fh.result.length>0){var filtered=fh.result.filter(function(r){return r.symbol&&r.symbol.indexOf(’.’)<0;}).slice(0,6);if(resEl){resEl.innerHTML=filtered.map(function(r){var sn=(r.description||r.symbol).replace(/’/g,’’).replace(/”/g,’’);return ‘<div class="ai-search-item" onclick="aiSelectTicker(\''+r.symbol+'\',\''+resId+'\')"><strong>’+r.symbol+’</strong> – ‘+sn+’</div>’;}).join(’’);resEl.classList.add(‘show’);}return;}
-if(resEl){resEl.innerHTML=’<div class="ai-search-item" onclick="aiSelectTicker(\''+q.toUpperCase()+'\',\''+resId+'\')">Use: ‘+q.toUpperCase()+’</div>’;resEl.classList.add(‘show’);}return;});
+if(!d||!Array.isArray(d)||!d.length){if(resEl){resEl.innerHTML=’<div class="ai-search-item" onclick="aiSelectTicker(\''+q.toUpperCase()+'\',\''+resId+'\')">Use: ‘+q.toUpperCase()+’</div>’;resEl.classList.add(‘show’);}return;}
 var filtered=d.filter(function(r){return r.symbol;}).slice(0,6);
 if(resEl){resEl.innerHTML=filtered.map(function(r){var sn=(r.name||r.symbol).replace(/’/g,’’).replace(/”/g,’’);return ‘<div class="ai-search-item" onclick="aiSelectTicker(\''+r.symbol+'\',\''+resId+'\')"><strong>’+r.symbol+’</strong> — ‘+sn+’</div>’;}).join(’’);resEl.classList.add(‘show’);}
 });
