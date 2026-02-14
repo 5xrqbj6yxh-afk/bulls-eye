@@ -1,4 +1,18 @@
-var CACHE='bep-v15-2';var ASSETS=['./index.html','./manifest.json'];
-self.addEventListener('install',function(e){e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(ASSETS);}));self.skipWaiting();});
-self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(k){return Promise.all(k.filter(function(n){return n!==CACHE;}).map(function(n){return caches.delete(n);}));}));self.clients.claim();});
-self.addEventListener('fetch',function(e){if(e.request.url.indexOf('finnhub')>=0||e.request.url.indexOf('financialmodelingprep')>=0||e.request.url.indexOf('yahoo')>=0||e.request.url.indexOf('allorigins')>=0){e.respondWith(fetch(e.request).catch(function(){return new Response('{}',{headers:{'Content-Type':'application/json'}});}));return;}e.respondWith(fetch(e.request).then(function(resp){if(resp.status===200){var rc=resp.clone();caches.open(CACHE).then(function(c){c.put(e.request,rc);});}return resp;}).catch(function(){return caches.match(e.request).then(function(r){return r||new Response('Offline');});}));});
+// Self-destruct: unregister this service worker and clear all caches
+self.addEventListener(‘install’, function(e) { self.skipWaiting(); });
+self.addEventListener(‘activate’, function(e) {
+e.waitUntil(
+caches.keys().then(function(k) {
+return Promise.all(k.map(function(n) { return caches.delete(n); }));
+}).then(function() {
+return self.registration.unregister();
+}).then(function() {
+return self.clients.matchAll();
+}).then(function(clients) {
+clients.forEach(function(c) { c.navigate(c.url); });
+})
+);
+});
+self.addEventListener(‘fetch’, function(e) {
+e.respondWith(fetch(e.request));
+});
